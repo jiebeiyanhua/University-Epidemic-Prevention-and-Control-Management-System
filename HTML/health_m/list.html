@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layui/css/layui.css">
+</head>
+<body>
+
+<table class="layui-hide" id="test" lay-filter="test"></table>
+<script src="../layui/layui.js" charset="utf-8"></script>
+<script>
+    // 定义全局变量
+    var table; // 保存table模块
+    var row;  // 保存当前操作行的数据
+    layui.use('table', function () {
+        table = layui.table;
+        var $ = layui.$;
+        // render : 渲染
+        table.render({
+            elem: '#test', // 找到table标签
+            url: 'http://localhost:8080/healthlist' /*加载表格中数据的url地址*/,
+            cols: [
+                [{
+                    field: 'id',
+                    title: 'id',
+                    width: 60,
+                    fixed: 'left',
+                    sort: true
+                }, {
+                    field: 'name',
+                    title: '学生姓名',
+                    width: 150,
+                    fixed: 'left',
+                    sort: true
+                },{
+                    field: 'course',
+                    title: '专业',
+                    width: 200
+                }, {
+                    field: 'sclass',
+                    title: '班级',
+                    width: 150
+                }, {
+                    field: 'healths',
+                    title: '健康码',
+                    width: 200
+                }, {
+                    field: 'detection',
+                    title: '核酸检测',
+                    width: 200
+                }, {
+                    field: 'contact',
+                    title: '联系方式',
+                    width: 200
+                }, {
+                    field: 'day',
+                    title: '填报日期',
+                    width: 150,
+					sort: true
+                }
+                ]
+            ],
+            page: true
+        });
+    });
+</script>
+
+</body>
+</html>

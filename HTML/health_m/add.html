@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <script src="../layui/layui.js" charset="utf-8"></script>
+</head>
+<body>
+<h1 style="font-size:35;margin-left: 40%;margin-top: 1%;">健康申报</h1>
+<div style="width: 50%;margin-top: 2%;margin-left: 20%;">
+    <form class="layui-form" action="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">名字</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" class="layui-input" id="uhealth">
+            </div>
+        </div>
+		<div class="layui-form-item">
+		    <label class="layui-form-label">专业</label>
+		    <div class="layui-input-block">
+		        <input type="text" name="course" class="layui-input" id="chealth">
+		    </div>
+		</div>
+		<div class="layui-form-item">
+		    <label class="layui-form-label">班级</label>
+		    <div class="layui-input-block">
+		        <input type="text" name="sclass" class="layui-input" id="shealth">
+		    </div>
+		</div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">健康码</label>
+            <div class="layui-input-block">
+                <input type="radio" name="healths" value="绿码" title="绿码" checked="">
+                <input type="radio" name="healths" value="红码" title="红码">
+                <input type="radio" name="healths" value="异常" title="异常">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">核酸检测</label>
+            <div class="layui-input-block">
+                <input type="radio" name="detection" value="阴性" title="阴性" checked="">
+                <input type="radio" name="detection" value="阳性" title="阳性">
+                <input type="radio" name="detection" value="报告未出" title="报告未出">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">联系方式</label>
+            <div class="layui-input-block">
+                <input type="text" name="contact" class="layui-input" id="conhealth">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">填报日期</label>
+            <div class="layui-input-inline">
+                <input type="text" name="day" id="uday" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-input-block"></div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    //Demo
+    layui.use(['form', 'layedit', 'laydate'], function () {
+        var form = layui.form
+        , layer = layui.layer
+        , layedit = layui.layedit
+        , laydate = layui.laydate;
+        // jquery是js的一个函数库
+        var $ = layui.$;// $代表的jquery
+        //日期
+        laydate.render({
+            elem: '#uday'
+        });
+        laydate.render({
+            elem: '#uday1'
+        });
+		document.getElementById("uhealth").value = localStorage.getItem("name")
+		document.getElementById("chealth").value = localStorage.getItem("course")
+		document.getElementById("shealth").value = localStorage.getItem("sclass")
+		document.getElementById("conhealth").value = localStorage.getItem("contact")
+        //监听提交
+        form.on('submit(formDemo)', function (datas) {
+            var sc = datas.field; // 请求的参数
+            // 调用jquery的ajax函数 ， 发异步请求
+            $.ajax({
+                url: 'http://localhost:8080/addhealth',// 请求地址
+                data: sc,// 请求参数
+                type: "get",// 请求方式是get方式，可以省略。
+                dataType: "json", // 期待的响应结果的类型为json.
+                // 请求成功，执行success函数，
+                // function(参数) ，参数是任意名字 ， 代表的都是响应结果中的数据
+                success: function (result) {
+                    if (result.msg == true) {
+                        layer.msg("添加成功")
+						$.ajax({
+							url:"http://localhost:8080/updatastudent",
+							data : {
+								id : localStorage.getItem("id"),
+								task : '已完成',
+								}, 
+							type:"get",
+							dataType:"json",
+							success:function(res){
+							}
+						})
+                    } else {
+                        layer.msg("添加失败")
+                    }
+                },
+            })
+            return false; // 阻止默认的submit事件的发生
+        });
+    });
+</script>
+</body>
+</html>

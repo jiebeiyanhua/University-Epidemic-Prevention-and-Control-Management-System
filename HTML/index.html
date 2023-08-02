@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>高校疫情防控管理系统</title>
+    <link rel="stylesheet" href="./layui/css/layui.css">
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs layui-bg-black">高校疫情防控管理系统</div>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item layui-hide layui-show-md-inline-block">
+                <a href="javascript:;">
+                    <img src="./images/user.png"
+                         class="layui-nav-img" id="userimage">
+                    <span id="loginuser">admin</span>
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a id="useruid">编号</a></dd>
+					<dd><a id="usertask">无消息</a></dd>
+                    <dd><a href="login.html">退出</a></dd>
+                </dl>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="" href="javascript:;">健康管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a onclick=give(); target="show" id="givehealth">发布任务</a></dd>
+						<script>
+							function give(){
+								if(localStorage.getItem("key") != 2){
+									document.getElementById("givehealth").href = "./health_m/give.html"
+								}else{
+									layer.msg("无权限发放任务")
+								}
+							}
+						</script>
+                        <dd><a onclick=add(); target="show" id="addhealths">申报任务</a></dd>
+						<script>
+							function add(){
+								if(localStorage.getItem("key") == 2){
+									document.getElementById("addhealths").href = "./health_m/add.html"
+								}else{
+									layer.msg("无需填报相关信息")
+								}
+							}
+						</script>
+                        <dd><a href="./health_m/list.html" target="show">查询健康申报任务</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">跨区域行程异动管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a id="addtravel" target="show" onclick=addtravel();>行程异动</a></dd>
+						<script>
+							function addtravel(){
+								if(localStorage.getItem("key") == 2){
+									document.getElementById("addtravel").href = "./travel_m/add.html"
+								}else{
+									layer.msg("无需填报相关信息")
+								}
+							}
+						</script>
+                        <dd><a href="./travel_m/list.html" target="show">查询行程异动</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">出入校门管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a id="addaccess" target="show" onclick=addaccess();>申请出入校门</a></dd>
+						<script>
+							function addaccess(){
+								if(localStorage.getItem("key") == 2){
+									document.getElementById("addaccess").href = "./access_m/add.html"
+								}else{
+									layer.msg("无需填报相关信息")
+								}
+							}
+						</script>
+                        <dd><a href="./access_m/list.html" target="show">查询出入校门</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item"><a href="javascript:;">网格化管理</a>
+				<dl class="layui-nav-child">
+					<dd><a id="skey" target="show" onclick=skey();>学生信息管理</a></dd>
+					<script>
+						function skey(){
+							if(localStorage.getItem("key") == 0){
+								document.getElementById("skey").href = "./m_m/list.html"
+							}else{
+								layer.msg("未分配权限")
+							}
+						}
+					</script>
+					<dd><a id="tkey" target="show" onclick=tkey();>老师信息管理</a></dd>
+					<script>
+						function tkey(){
+							if(localStorage.getItem("key") == 0){
+								document.getElementById("tkey").href = "./m_m/listt.html"
+							}else{
+								layer.msg("未分配权限")
+							}
+						}
+					</script>
+				</dl>
+                </li>
+                <li class="layui-nav-item"><a href="login.html">退出系统</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div style="padding: 3px;">
+            <iframe src="./health_m/list.html" style="border:0 ; width:100% ;
+					height:800px;" name="show"></iframe>
+        </div>
+    </div>
+
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        版权所属：城科19大数据2班张天意
+    </div>
+</div>
+<script src="./layui/layui.js"></script>
+<script>
+    //JS
+    layui.use(['element', 'layer', 'util'], function () {
+        var element = layui.element,
+            layer = layui.layer,
+            util = layui.util,
+            $ = layui.$;
+        // 修改登录用户的名字的显示
+		$("#useruid").html("编号："+window.localStorage.uid)
+		//判断老师或者是学生
+		$.ajax({
+			url:"http://localhost:8080/teacherlist",
+			success: function (result) {
+				for(var i=0;i<result['count'];i++){
+					if(result['data'][i]["uid"]==window.localStorage.uid){
+						$("#loginuser").html(result['data'][i]["name"]+"老师")
+						localStorage.setItem("key", 1);
+						localStorage.setItem("name", result['data'][i]["name"]);
+						localStorage.setItem("task", result['data'][i]["task"]);
+					}
+					if(localStorage.getItem("task") == "任务已发布"){
+						layer.msg("有新的消息，请在头像处查看")
+						$("#usertask").html("任务："+"学生异常")
+					}else{
+						$("#usertask").html("无任务")
+					}
+				}			
+			}
+		})
+		$.ajax({
+			url:"http://localhost:8080/studentlist",
+			success: function (result) {
+				for(var i=0;i<result['count'];i++){
+					if(result['data'][i]["uid"]==window.localStorage.uid){
+						result['data'][i]["uid"]
+						$("#loginuser").html(result['data'][i]["name"]+"学生")
+						localStorage.setItem("key", 2);
+						localStorage.setItem("id", result['data'][i]["id"]);
+						localStorage.setItem("name", result['data'][i]["name"]);
+						localStorage.setItem("course", result['data'][i]["course"]);
+						localStorage.setItem("sclass", result['data'][i]["sclass"]);
+						localStorage.setItem("contact", result['data'][i]["contact"]);
+						localStorage.setItem("task", result['data'][i]["task"]);
+					}
+					if(localStorage.getItem("task") == "未完成"){
+						layer.msg("有新的消息，请在头像处查看")
+						$("#usertask").html("任务："+"健康上报")
+					}else{
+						$("#usertask").html("无任务")
+					}
+				}	
+			}
+		})
+		//判断管理员
+		if(window.localStorage.uid=="root"){
+			$("#loginuser").html("管理员")
+			localStorage.setItem("task", "");
+			localStorage.setItem("key", 0);
+			$("#userimage").attr("src","./images/admin.png")
+		}
+		
+    });
+</script>
+</body>
+</html>

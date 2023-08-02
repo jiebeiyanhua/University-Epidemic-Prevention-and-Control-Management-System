@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layui/css/layui.css">
+</head>
+<body>
+<table class="layui-hide" id="test" lay-filter="test"></table>
+<script type="text/html" id="toolbarDemo">
+  <div class="layui-btn-container">
+  <button type="button" class="layui-btn" lay-event="add">
+    <i class="layui-icon layui-icon-add-1" style="font-size: 20px;">添加</i>
+	</button>
+  </div>
+</script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="updata">修改</a>
+	<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script src="../layui/layui.js" charset="utf-8"></script>
+<script>
+    // 定义全局变量
+    var table; // 保存table模块
+    var row;  // 保存当前操作行的数据
+    layui.use('table', function () {
+        table = layui.table;
+        var $ = layui.$;
+        // render : 渲染
+        table.render({
+            elem: '#test', // 找到table标签
+            url: 'http://localhost:8080/studentlist' /*加载表格中数据的url地址*/,
+			toolbar: '#toolbarDemo',
+            cols: [
+                [{
+                    field: 'id',
+                    title: 'id',
+                    width: 60,
+					fixed:"left",
+                    sort: true
+                },{
+                    field: 'name',
+                    title: '学生姓名',
+                    width: 150,
+					fixed:"left",
+                    sort: true
+                }, {
+                    field: 'uid',
+                    title: 'uid',
+                    width: 200
+                }, {
+                    field: 'course',
+                    title: '专业',
+                    width: 300
+                }, {
+                    field: 'sclass',
+                    title: '班级',
+                    width: 100
+                }, {
+                    field: 'contact',
+                    title: '联系方式',
+                    width: 200
+                }, {
+                    field: 'dormitory',
+                    title: '寝室号',
+                    width: 100
+                }, {
+                    field: 'teacher',
+                    title: '辅导员',
+                    width: 200
+                }, {
+                    fixed: 'right',
+                    title: '操作',
+                    toolbar: '#barDemo',
+                    width: 150
+                }
+                ]
+            ],
+            page: true
+        });
+        //监听头工具栏事件
+		table.on('toolbar(test)', function (obj) {
+			if(obj.event === 'add'){
+				layer.open({// -- 打开编辑窗口
+					type: 2, // 显示一个完整的html页面
+					title: '添加',
+					area: ['800px', '450px'],
+					content: './add.html',
+					maxmin: true,
+					move: true
+				})
+			}
+		});
+		//监听行工具事件
+        table.on('tool(test)', function (obj) {
+            var data = obj.data; // data 就是当前操作的这一行的数据
+            row = data; // 给全局变量row赋值
+            if (obj.event === 'del') {
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        url: "http://localhost:8080/deletestudent",
+                        data: {id: data.id},
+                        type: "get",
+                        dataType: "json",
+                        success: function (result) {
+                            if (result.msg == true) {
+                                layer.msg("删除成功")
+                                //--- 刷新数据表格： table.reload(table标签的id) -- 调用table的render函数
+                                table.reload("test")
+                            } else {
+                                layer.msg("删除失败")
+                            }
+                        }
+                    })
+                    layer.close(index);
+                });
+            } else if (obj.event === 'updata') {
+                layer.open({// -- 打开编辑窗口
+                	type: 2, // 显示一个完整的html页面
+                	title: '更新',
+                	area: ['800px', '450px'],
+                	content: './updata.html',
+                	maxmin: true,
+                	move: true
+                })
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

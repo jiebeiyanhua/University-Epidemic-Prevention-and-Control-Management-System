@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layui/css/layui.css">
+</head>
+<body>
+<table class="layui-hide" id="test" lay-filter="test"></table>
+<script type="text/html" id="toolbarDemo">
+  <div class="layui-btn-container">
+  <button type="button" class="layui-btn" lay-event="add">
+    <i class="layui-icon layui-icon-add-1" style="font-size: 20px;">发布</i>
+	</button>
+	<button type="button" class="layui-btn" lay-event="quxiao">
+	  <i class="layui-icon layui-icon-add-1" style="font-size: 20px;">重置</i>
+		</button>
+  </div>
+</script>
+<script src="../layui/layui.js" charset="utf-8"></script>
+<script>
+    // 定义全局变量
+    var table; // 保存table模块
+    var row;  // 保存当前操作行的数据
+    layui.use('table', function () {
+        table = layui.table;
+        var $ = layui.$;
+        // render : 渲染
+        table.render({
+            elem: '#test', // 找到table标签
+            url: 'http://localhost:8080/student_t?teacher='+localStorage.getItem("name") /*加载表格中数据的url地址*/,
+			toolbar: '#toolbarDemo',
+            cols: [
+                [{
+					type: 'checkbox', 
+					fixed: 'left'
+				},{
+                    field: 'id',
+                    title: 'id',
+                    width: 60,
+					fixed:"left",
+                    sort: true
+                },{
+                    field: 'name',
+                    title: '学生姓名',
+                    width: 150,
+					fixed:"left",
+                    sort: true
+                }, {
+                    field: 'uid',
+                    title: 'uid',
+                    width: 200
+                }, {
+                    field: 'course',
+                    title: '专业',
+                    width: 300
+                }, {
+                    field: 'sclass',
+                    title: '班级',
+                    width: 100
+                }, {
+                    field: 'contact',
+                    title: '联系方式',
+                    width: 200
+                }, {
+                    field: 'dormitory',
+                    title: '寝室号',
+                    width: 100
+                }, {
+                    field: 'teacher',
+                    title: '辅导员',
+                    width: 200
+                },{
+					field: 'task',
+					title: '任务',
+					width: 150
+				}
+                ]
+            ],
+            page: true
+        });
+        //监听头工具栏事件
+		table.on('toolbar(test)', function (obj) {
+			var checkStatus = table.checkStatus(obj.config.id)
+			,data = checkStatus.data;
+			if(obj.event === 'add'){
+				if(data.length === 0){
+				    layer.msg('请选择一行');
+				} else if(data.length > 1){
+				    layer.msg('只能同时发布一个');
+				} else {
+				    $.ajax({
+				    	url:"http://localhost:8080/updatastudent",
+				    	data : {
+							id : checkStatus.data[0]['id'],
+							uid : checkStatus.data[0]['uid'],	
+							dormitory : checkStatus.data[0]['dormitory'],
+							teacher : checkStatus.data[0]['teacher'],
+							task : '未完成',
+							}, 
+				    	type:"get",
+				    	dataType:"json",
+				    	success:function(res){
+				    		if(res.msg){
+				    			layer.msg("发布成功");
+				    		}else{
+				    			layer.msg("发布失败")
+				    		}
+				    		setTimeout(function(){
+				    			location.replace(location.href);
+				    		}, 1000) // 一次性定时器函数，表示等待3秒之后，之后函数的内容
+				    	}
+				    })
+				}
+			}else if(obj.event === 'quxiao'){
+				if(data.length === 0){
+				    layer.msg('请选择一行');
+				} else if(data.length > 1){
+				    layer.msg('只能同时发布一个');
+				} else {
+				    $.ajax({
+				    	url:"http://localhost:8080/updatastudent",
+				    	data : {
+							id : checkStatus.data[0]['id'],
+							uid : checkStatus.data[0]['uid'],	
+							dormitory : checkStatus.data[0]['dormitory'],
+							teacher : checkStatus.data[0]['teacher'],
+							task : '未发布',
+							}, 
+				    	type:"get",
+				    	dataType:"json",
+				    	success:function(res){
+				    		if(res.msg){
+				    			layer.msg("重置成功");
+				    		}else{
+				    			layer.msg("重置失败")
+				    		}
+				    		setTimeout(function(){
+				    			location.replace(location.href);
+				    		}, 1000) // 一次性定时器函数，表示等待3秒之后，之后函数的内容
+				    	}
+				    })
+				}
+			}
+		});
+    });
+</script>
+
+</body>
+</html>

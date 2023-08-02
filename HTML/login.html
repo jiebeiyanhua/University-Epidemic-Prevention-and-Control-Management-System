@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>高校疫情防控管理系统</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./layui/css/layui.css">
+    <script src="./layui/layui.js" charset="utf-8"></script>
+</head>
+<body background="images/login-bg.jpg"
+      style=" background-repeat:no-repeat ;background-size:cover;background-attachment: fixed;">
+<div style="width:600px; background-color: #fff;border-radius: 20px;margin-top: 5%;margin-left: 35%;margin-right: 35%;opacity: 0.75;">
+    <div class="layui-input-block"></div>
+    <h1 style="font-size: 45px;text-align: center;">高校疫情防控管理系统</h1>
+    <h2 style="font-size: 30px;text-align: center;margin-top: 20px;">登陆界面</h2>
+    <P style="text-align: center; margin-top:20px;margin-bottom: 20px;">创建新账号？<a class="layui-font-red"
+                                                                                 href="register.html">注册</a></P>
+    <form class="layui-form" action="">
+        <div style="margin-left:15%; margin-right:25%;">
+            <label class="layui-form-label"><span style="color: #f00;">*&nbsp;</span>用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="username" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-input-block"></div>
+        </div>
+        <div style="margin-left:15%; margin-right:25%;">
+            <label class="layui-form-label"><span style="color: #f00;">*&nbsp;</span>密码</label>
+            <div class="layui-input-block">
+                <input type="password" name="password" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-input-block"></div>
+        </div>
+        <div style="margin-left:15%; margin-right:20%;">
+            <label class="layui-form-label"><span style="color: #f00;">*&nbsp;</span>验证码</label>
+            <div class="layui-input-inline">
+                <input type="text" name="code" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>
+            <div id="box2" class="layui-input-inline"
+                 style="width: 80px;height: 45px;background: #bbb;text-align: center;line-height: 50px;font-size: 30px;margin: 0px auto;"
+                 onclick="clicked();" onselectstart="return false;">
+                <script type="text/javascript">
+                    var str = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+                    var strr = "";
+                    for (i = 0; i < 4; i++) {
+                        strr = strr + str[Math.floor(Math.random() * 62)];
+                    }
+                    document.getElementById("box2").innerHTML = strr;
+
+                    function clicked() {
+                        var str = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+                        strr = "";
+                        for (i = 0; i < 4; i++) {
+                            strr = strr + str[Math.floor(Math.random() * 62)];
+                        }
+                        document.getElementById("box2").innerHTML = strr;
+                    }
+                </script>
+            </div>
+        </div>
+        <div class="layui-input-block"></div>
+        <div style="margin-left:15%; margin-right:25%;">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo">登录</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+        <div class="layui-input-block"></div>
+    </form>
+</div>
+
+<script>
+    //Demo
+    layui.use('form', function () {
+        var form = layui.form;
+        // jquery是js的一个函数库
+        var $ = layui.$; // $代表的jquery
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+            var user = data.field; // 请求的参数
+            // 调用jquery的ajax函数 ， 发异步请求
+			if(user["code"].toUpperCase() == document.getElementById("box2").innerHTML.toUpperCase().trim()){
+					$.ajax({
+					    url: 'http://localhost:8080/login', // 请求地址
+					    data: {"username":user["username"],"password":user["password"]}, // 请求参数
+					    type: "get", // 请求方式是get方式，可以省略。
+					    dataType: "json", // 期待的响应结果的类型为json.
+					    // 请求成功，执行success函数，
+					    // function(参数) ，参数是任意名字 ， 代表的都是响应结果中的数据
+					    success: function (result) {
+							if (result.msg == true) {
+								layer.msg("登录成功")
+								// --- 把登录用户的名字，保存再浏览器的本地存储中
+								window.localStorage.uid = result.user.uid;
+								// --- 登录成功， 跳转到主页,index.html
+								window.location.href = "index.html"
+							}else {
+								layer.msg("用户名和密码错误")
+							}
+					    }
+					})
+			}else{
+				var str = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+				strr = "";
+				for (i = 0; i < 4; i++) {
+				    strr = strr + str[Math.floor(Math.random() * 62)];
+				}
+				document.getElementById("box2").innerHTML = strr;
+				layer.msg("验证码错误")
+			}
+				return false; // 阻止默认的submit事件的发生
+        });
+    });
+</script>
+</body>
+</html>
